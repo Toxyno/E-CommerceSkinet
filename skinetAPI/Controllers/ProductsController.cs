@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Skinet.Core.Entities;
+using Skinet.Core.Interfaces;
 using Skinet.Infrastructure.Data;
 
 namespace skinetAPI.Controllers
@@ -11,18 +12,28 @@ namespace skinetAPI.Controllers
     [Route("api/[controller]")]
     public class ProductsController : ControllerBase
     {
-        private readonly StoreContext _context;
-        public ProductsController(StoreContext context)
+        ////We need to detach the storeContext scope away from our Controller
+        //So we need to Reference the InterfaceRepo that has been created for the controller
+        // private readonly StoreContext _context;
+
+        // public ProductsController(StoreContext context)
+        // {
+        //     _context = context;
+        // }
+        private readonly IProductRepository _productrepo;
+
+        public ProductsController(IProductRepository productrepo)
         {
-            _context = context;
+            _productrepo = productrepo;
+
         }
 
         [HttpGet]
         public async Task<ActionResult<List<Product>>> GetProducts()
         {
-            var producta = await _context.Products.ToListAsync();
+            var products = await _productrepo.GetProductsAsync();
 
-            return Ok(producta);
+            return Ok(products);
         }
 
 
@@ -34,9 +45,21 @@ namespace skinetAPI.Controllers
         // }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Product>>  GetProduct(int id)
+        public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            return await _context.Products.FindAsync(id);
+            return await _productrepo.GetProductByIdAsync(id);
+        }
+
+        [HttpGet("brands")]
+        public async Task<ActionResult<IReadOnlyList<ProductBrand>>> GetProductBrands()
+        {
+            return Ok(await _productrepo.GetProductBrandsAsync());
+        }
+
+         [HttpGet("types")]
+         public async Task<ActionResult<IReadOnlyList<ProductType>>> GetProductTypes()
+        {
+            return Ok(await _productrepo.GetProductTypesAsync());
         }
     }
 }

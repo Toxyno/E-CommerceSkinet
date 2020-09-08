@@ -11,7 +11,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Skinet.Core.Interfaces;
 using Skinet.Infrastructure.Data;
+using Skinet.Infrastructure.Data.ConcreteRepository;
 
 namespace skinetAPI
 {
@@ -31,9 +33,13 @@ namespace skinetAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+          
+
             services.AddControllers();
             //datacontext as a service so it can be used
             services.AddDbContext<StoreContext>(x => x.UseSqlite(_config.GetConnectionString("DefaultConnection")));
+            //AddScoped specified the life time of our service.ASide that, we also have Transient and Singleton
+            services.AddScoped<IProductRepository,ProductRepository>();        
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
