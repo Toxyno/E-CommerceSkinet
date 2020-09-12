@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Skinet.Core.Entities;
@@ -9,12 +10,11 @@ using Skinet.Core.Interfaces;
 using Skinet.Core.Specifications;
 using Skinet.Infrastructure.Data;
 using skinetAPI.DTOs;
+using skinetAPI.Errors;
 
 namespace skinetAPI.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ProductsController : ControllerBase
+       public class ProductsController : BaseApiController
     {
         ////We need to detach the storeContext scope away from our Controller
         //So we need to Reference the InterfaceRepo that has been created for the controller
@@ -77,10 +77,14 @@ namespace skinetAPI.Controllers
         // }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ProductToReturnDTO>> GetProduct(int id)
         {
-            var spec = new ProductWithTypesAndBrandsSpecification();
+            var spec = new ProductWithTypesAndBrandsSpecification(id);
             var product = await _productsRepo.GetEntityWithSpec(spec);
+            
+            if(product == null) return NotFound(new ApiResponse(404));
 
             return _mapper.Map<Product,ProductToReturnDTO>(product);
 
