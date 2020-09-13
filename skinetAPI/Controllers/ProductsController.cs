@@ -11,10 +11,11 @@ using Skinet.Core.Specifications;
 using Skinet.Infrastructure.Data;
 using skinetAPI.DTOs;
 using skinetAPI.Errors;
+using skinetAPI.Helpers;
 
 namespace skinetAPI.Controllers
 {
-       public class ProductsController : BaseApiController
+    public class ProductsController : BaseApiController
     {
         ////We need to detach the storeContext scope away from our Controller
         //So we need to Reference the InterfaceRepo that has been created for the controller
@@ -50,12 +51,16 @@ namespace skinetAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<ProductToReturnDTO>>> GetProducts()
+        public async Task<ActionResult<Pagination<ProductToReturnDTO>>> GetProducts([FromQuery]ProductSpecParams productParams)
         {
-            var spec = new ProductWithTypesAndBrandsSpecification();
-            var products = await _productsRepo.LisyAsync(spec);
+            var spec = new ProductWithTypesAndBrandsSpecification(productParams);
             
-            return Ok(_mapper.Map<IReadOnlyList<Product>,IReadOnlyList<ProductToReturnDTO>>(products));
+            var countSpec = new ProductWithFiltersForCountSpecification(productParams);
+           var totalItems = await _productsRepo.CountAsync(countSpec);
+            var products = await _productsRepo.ListAsync(spec);
+            
+            var data = _mapper.Map<IReadOnlyList<Product>, IReadOnlyList<ProductToReturnDTO>>(products);
+            return Ok(new Pagination<ProductToReturnDTO>(productParams.PageIndex,productParams.PageSize,totalItems,data));
             // return products.Select(product => new ProductToReturnDTO
             // {
             //     Id = product.Id,
