@@ -38,6 +38,8 @@ namespace skinetAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+             
+
             services.AddAutoMapper(typeof(MappingProfile));   //Registering AutoMapper As a Service
             //datacontext as a service so it can be used
             services.AddDbContext<StoreContext>(x => x.UseSqlite(_config.GetConnectionString("DefaultConnection")));
@@ -63,6 +65,7 @@ namespace skinetAPI
             // {
             //     app.UseDeveloperExceptionPage();
             // }
+      
             app.UseMiddleware<ExceptionMiddleware>();
             app.UseStatusCodePagesWithReExecute("/errors/{0}");
 
@@ -71,7 +74,7 @@ namespace skinetAPI
 
             app.UseRouting();
             app.UseStaticFiles();
-            app.UseCors("CorsPolicy");
+            ///app.UseCors("CorsPolicy");
             app.UseAuthorization();
 
             
