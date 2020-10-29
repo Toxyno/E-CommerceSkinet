@@ -99,7 +99,6 @@
             "styles": [
               "./node_modules/bootstrap/dist/css/bootstrap.min.css",
               "./node_modules/ngx-bootstrap/datepicker/bs-datepicker.css",
-              "./node_modules/font-awesome/css/font-awesome.min.css",
               "src/styles.scss"
             ],
             "scripts": []
@@ -135,6 +134,6 @@
   },
   "defaultProject": "skinetClient",
   "cli": {
-    "analytics": "6a91cc82-0596-4e53-aba7-42042433c61d"
+    "analytics": "7473c7e7-6c07-4afd-9506-97a82a311c78"
   }
 }
